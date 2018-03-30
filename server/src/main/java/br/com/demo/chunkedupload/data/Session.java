@@ -3,6 +3,7 @@ package br.com.demo.chunkedupload.data;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -27,6 +28,7 @@ public class Session {
     private Long user;
 
     public Session(Long user, String fileName, int chunkSize, Long fileSize) {
+
 	id = UUID.randomUUID().toString();
 
 	createdDate = LocalDateTime.now();
@@ -37,7 +39,9 @@ public class Session {
 	this.totalNumberOfChunks = (int) Math.ceil(fileSize / chunkSize);
 
 	storage = new LocalFileSystemStorage();
-	alreadyPersistedBlocks = new HashSet<>();
+	alreadyPersistedBlocks = Collections.synchronizedSet(new HashSet<>());
+
+	System.out.println("Finished creating session for user " + user + " and file " + fileName + ". ID: " + id);
     }
 
     /**
@@ -143,7 +147,7 @@ public class Session {
      * @throws IOException
      */
     public byte[] getChunkContent(int chunkIndex) throws IndexOutOfBoundsException, IOException {
-	if (chunkIndex >= this.getTotalNumberOfChunks())
+	if (chunkIndex > this.getTotalNumberOfChunks())
 	    throw new IndexOutOfBoundsException();
 
 	return storage.read(id, chunkIndex);

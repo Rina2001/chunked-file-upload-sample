@@ -57,12 +57,20 @@ public class FileResource {
 	    @ApiResponse(code = 410, message = "Session expired"),
 	    @ApiResponse(code = 500, message = "Internal server error") })
     public Response uploadFile(@ApiParam(value = "ID of user", required = true) @PathParam("userId") Long userId,
-	    @QueryParam("chunkNumber") int chunkNumber, @QueryParam("chunkSize") int chunkSize,
-	    @QueryParam("totalSize") Long totalSize,
+	    @ApiParam(value = "Chunk number (starts from 1)", required = true) @QueryParam("chunkNumber") int chunkNumber,
+	    @ApiParam(value = "Chunk size in bytes", required = true) @QueryParam("chunkSize") int chunkSize,
+	    @ApiParam(value = "Total file size", required = true) @QueryParam("totalSize") Long totalSize,
 	    @ApiParam(value = "file to upload") @FormDataParam("file") InputStream inputStream,
 	    @ApiParam(value = "file detail") @FormDataParam("file") FormDataContentDisposition fileDetail) {
 	try {
 	    Session session = getOrCreateSession(userId, chunkSize, totalSize, fileDetail.getFileName());
+
+	    // may happen when the session is still being created.
+	    // I chose to do this and tell the client to send the package again
+	    // instead of adding a busy wait on the server side.
+	    if (session == null) {
+		return Response.status(202).build();
+	    }
 
 	    if (session.isExpired()) {
 		return Response.status(410).build();
@@ -79,7 +87,7 @@ public class FileResource {
 
 	    return Response.status(200).build();
 	} catch (Exception e) {
-	    return Response.status(500).build();
+	    return new SampleExceptionMapper().toResponse(e);
 	}
     }
 
@@ -170,15 +178,16 @@ public class FileResource {
 	    public void write(OutputStream out) throws IOException, WebApplicationException {
 		Writer writer = new BufferedWriter(new OutputStreamWriter(out));
 
-		for (int i = 0; i < session.getTotalNumberOfChunks(); i++) {
+		// chunk numbers under this API start from 1.
+		for (int i = 1; i <= session.getTotalNumberOfChunks(); i++) {
 		    IOUtils.write(session.getChunkContent(i), writer);
 		}
 
 		writer.flush();
 	    }
 	};
-
-	return Response.ok(stream).build();
+	return Response.ok(stream)
+		.header("Content-Disposition", "attachment; filename=\"" + session.getFileName() + "\"").build();
     }
 
     private Session getOrCreateSession(Long userId, int chunkSize, Long totalSize, String fileName)

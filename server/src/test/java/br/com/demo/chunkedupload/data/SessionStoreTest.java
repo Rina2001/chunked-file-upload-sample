@@ -6,8 +6,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 
-import br.com.demo.chunkedupload.data.Session;
-import br.com.demo.chunkedupload.data.SessionStore;
 import br.com.demo.chunkedupload.exception.InvalidOperationException;
 
 public class SessionStoreTest {
@@ -25,12 +23,6 @@ public class SessionStoreTest {
 
     @Test
     public void create_withValidUserIdAndFileName_shouldCreateSession() throws InvalidOperationException {
-	sessionStore.createSession(VALID_USER, VALID_FILE_NAME, CHUNK_SIZE, TOTAL_SIZE);
-    }
-
-    @Test(expected = InvalidOperationException.class)
-    public void create_withUserIdAndFileNameDuplicity_shouldThrowException() throws InvalidOperationException {
-	sessionStore.createSession(VALID_USER, VALID_FILE_NAME, CHUNK_SIZE, TOTAL_SIZE);
 	sessionStore.createSession(VALID_USER, VALID_FILE_NAME, CHUNK_SIZE, TOTAL_SIZE);
     }
 
