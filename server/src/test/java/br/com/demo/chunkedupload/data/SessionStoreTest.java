@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import br.com.demo.chunkedupload.exception.InvalidOperationException;
+import br.com.demo.chunkedupload.exception.SessionAlreadyBeingCreatedException;
 
 public class SessionStoreTest {
     private static Long VALID_USER = 1L;
@@ -22,19 +23,22 @@ public class SessionStoreTest {
     }
 
     @Test
-    public void create_withValidUserIdAndFileName_shouldCreateSession() throws InvalidOperationException {
+    public void create_withValidUserIdAndFileName_shouldCreateSession()
+	    throws InvalidOperationException, SessionAlreadyBeingCreatedException {
 	sessionStore.createSession(VALID_USER, VALID_FILE_NAME, CHUNK_SIZE, TOTAL_SIZE);
     }
 
     @Test
-    public void getSession_withValidUserAndFileName_shouldReturnSession() throws InvalidOperationException {
+    public void getSession_withValidUserAndFileName_shouldReturnSession()
+	    throws InvalidOperationException, SessionAlreadyBeingCreatedException {
 	sessionStore.createSession(VALID_USER, VALID_FILE_NAME, CHUNK_SIZE, TOTAL_SIZE);
 	Session session = sessionStore.getSession(VALID_USER, VALID_FILE_NAME);
 	assertNotNull(session);
     }
 
     @Test
-    public void getSession_withNullParameters_shouldReturnNull() throws InvalidOperationException {
+    public void getSession_withNullParameters_shouldReturnNull()
+	    throws InvalidOperationException, SessionAlreadyBeingCreatedException {
 	sessionStore.createSession(VALID_USER, VALID_FILE_NAME, CHUNK_SIZE, TOTAL_SIZE);
 	Session session = sessionStore.getSession(null, null);
 	assertNull(session);

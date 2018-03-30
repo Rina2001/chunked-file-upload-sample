@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import br.com.demo.chunkedupload.exception.InvalidOperationException;
+import br.com.demo.chunkedupload.exception.SessionAlreadyBeingCreatedException;
 
 public class SessionStore {
 
@@ -31,13 +32,14 @@ public class SessionStore {
      * @throws InvalidOperationException
      */
     public Session createSession(Long user, String fileName, int chunkSize, Long fileSize)
-	    throws InvalidOperationException {
+	    throws InvalidOperationException, SessionAlreadyBeingCreatedException {
 
 	System.out
 		.println("Requested to create session for user " + user + " and file " + fileName + " on SessionStore");
 
 	String key = buildKey(user, fileName);
 
+	// avoids a race condition on session creation...
 	if (!sessionLocks.contains(key)) {
 	    sessionLocks.add(key);
 
@@ -47,13 +49,11 @@ public class SessionStore {
 	    }
 	}
 
-	// while (sessions.get(key) == null) {
-	// try {
-	// Thread.sleep(10);
-	// } catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	// }
+	// ... but doesn't wait for the session to be created
+	// throws the problem on the wind and let someone else handle it :-)
+	if (sessions.get(key) == null) {
+	    throw new SessionAlreadyBeingCreatedException("Session is still being created by another request");
+	}
 
 	return sessions.get(key);
 

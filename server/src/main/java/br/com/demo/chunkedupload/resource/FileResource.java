@@ -30,6 +30,7 @@ import com.sun.jersey.multipart.FormDataParam;
 import br.com.demo.chunkedupload.data.Session;
 import br.com.demo.chunkedupload.data.SessionStore;
 import br.com.demo.chunkedupload.exception.InvalidOperationException;
+import br.com.demo.chunkedupload.exception.SessionAlreadyBeingCreatedException;
 import br.com.demo.chunkedupload.model.UploadStatusResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,13 +66,6 @@ public class FileResource {
 	try {
 	    Session session = getOrCreateSession(userId, chunkSize, totalSize, fileDetail.getFileName());
 
-	    // may happen when the session is still being created.
-	    // I chose to do this and tell the client to send the package again
-	    // instead of adding a busy wait on the server side.
-	    if (session == null) {
-		return Response.status(202).build();
-	    }
-
 	    if (session.isExpired()) {
 		return Response.status(410).build();
 	    }
@@ -86,6 +80,8 @@ public class FileResource {
 	    LOG.debug("File " + fileDetail.getFileName() + ", block " + chunkNumber + " saved successfully");
 
 	    return Response.status(200).build();
+	} catch (SessionAlreadyBeingCreatedException ce) {
+	    return Response.status(202).build();
 	} catch (Exception e) {
 	    return new SampleExceptionMapper().toResponse(e);
 	}
@@ -128,37 +124,6 @@ public class FileResource {
 	}
     }
 
-    // @GET
-    // @Path("/download/{fileId}")
-    // // @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    // @ApiOperation(value = "downloads a previously uploaded file")
-    // public StreamingOutput downloadFile(
-    // @ApiParam(value = "File ID", required = true) @PathParam("fileId") String
-    // fileId, OutputStream output)
-    // throws Exception {
-    // return new StreamingOutput() {
-    // @Override
-    // public void write(OutputStream arg0) throws IOException,
-    // WebApplicationException {
-    // BufferedOutputStream bus = new BufferedOutputStream(arg0);
-    // try {
-    // // ByteArrayInputStream reader = (ByteArrayInputStream)
-    // // Thread.currentThread().getContextClassLoader().getResourceAsStream();
-    // // byte[] input = new byte[2048];
-    // java.net.URL uri =
-    // Thread.currentThread().getContextClassLoader().getResource("");
-    // File file = new File("D:\\Test1.zip");
-    // FileInputStream fizip = new FileInputStream(file);
-    // byte[] buffer2 = IOUtils.toByteArray(fizip);
-    // bus.write(buffer2);
-    // } catch (Exception e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // }
-    // }
-    // };
-    // }
-
     @GET
     @Path("/download/{sessionId}")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"), @ApiResponse(code = 404, message = "Not found"),
@@ -191,7 +156,7 @@ public class FileResource {
     }
 
     private Session getOrCreateSession(Long userId, int chunkSize, Long totalSize, String fileName)
-	    throws InvalidOperationException {
+	    throws InvalidOperationException, SessionAlreadyBeingCreatedException {
 	Session session = sessionStore.getSession(userId, fileName);
 
 	if (session == null) {
