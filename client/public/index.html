@@ -110,12 +110,12 @@
               $('<td>').text(item.fileName),
               $('<td>').text(item.createdDate),
               $('<td>').text(item.lastUpdate),
-              $('<td>').text(item.progress),
+              $('<td>').text((item.progress * 100).toFixed(2) + "%"),
               $('<td>').text(item.expired),
               $('<td>').append(
-                $("<a>")
+                item.concluded ? $("<a>")
                   .attr('href', host + '/api/file/download/' + item.id)
-                  .text('download'))
+                  .text('download') : $("<span>"))
             );
 
             $tr.appendTo('#records_table tbody')

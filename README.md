@@ -1,5 +1,6 @@
 # Sample application for chunked file upload
 [![Build Status](https://travis-ci.org/edsoncunha/chunked-file-upload-sample.svg?branch=master)](https://travis-ci.org/edsoncunha/chunked-file-upload-sample)
+[![License Apache2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ## Client
 
