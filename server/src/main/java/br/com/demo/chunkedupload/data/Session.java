@@ -17,13 +17,13 @@ public class Session {
     private LocalDateTime createdDate;
 
     private String fileName;
+    private Long fileSize;
     private String id;
+
     private LocalDateTime lastUpdate;
-
     private StorageMedium storage;
-    private Long TIMEOUT_IN_SECONDS = 3600L;
 
-    private int totalNumberOfChunks;
+    private Long TIMEOUT_IN_SECONDS = 3600L;
 
     private Long user;
 
@@ -36,12 +36,27 @@ public class Session {
 	this.user = user;
 	this.fileName = fileName;
 	this.chunkSize = chunkSize;
-	this.totalNumberOfChunks = (int) Math.ceil(fileSize / chunkSize);
+	this.fileSize = fileSize;
 
 	storage = new LocalFileSystemStorage();
 	alreadyPersistedBlocks = Collections.synchronizedSet(new HashSet<>());
+    }
 
-	System.out.println("Finished creating session for user " + user + " and file " + fileName + ". ID: " + id);
+    /**
+     * Gets the byte array of a file chunk
+     * 
+     * @param chunkIndex
+     *            (starts from zero)
+     * @return
+     * @throws IndexOutOfBoundsException
+     * @throws IOException
+     */
+    public byte[] getChunkContent(int chunkIndex) throws IndexOutOfBoundsException, IOException {
+	if (chunkIndex > this.getTotalNumberOfChunks())
+	    throw new IndexOutOfBoundsException();
+
+	return storage.read(id, chunkIndex);
+
     }
 
     /**
@@ -63,6 +78,10 @@ public class Session {
      */
     public String getFileName() {
 	return fileName;
+    }
+
+    public Long getFileSize() {
+	return fileSize;
     }
 
     public String getId() {
@@ -98,7 +117,7 @@ public class Session {
      * @return the totalNumberOfChunks
      */
     public int getTotalNumberOfChunks() {
-	return totalNumberOfChunks;
+	return (int) Math.ceil(fileSize / chunkSize);
     }
 
     /**
@@ -113,7 +132,7 @@ public class Session {
     }
 
     public boolean isConcluded() {
-	return totalNumberOfChunks == alreadyPersistedBlocks.size();
+	return getTotalNumberOfChunks() == alreadyPersistedBlocks.size();
     }
 
     public boolean isExpired() {
@@ -121,7 +140,7 @@ public class Session {
     }
 
     public void persistBlock(int chunkNumber, byte[] buffer) throws InvalidOperationException {
-	if (chunkSize != buffer.length) {
+	if (chunkSize != buffer.length && chunkNumber < getTotalNumberOfChunks()) {
 	    throw new InvalidOperationException("Wrong chunk size");
 	}
 
@@ -135,23 +154,6 @@ public class Session {
 	}
 
 	this.lastUpdate = LocalDateTime.now();
-    }
-
-    /**
-     * Gets the byte array of a file chunk
-     * 
-     * @param chunkIndex
-     *            (starts from zero)
-     * @return
-     * @throws IndexOutOfBoundsException
-     * @throws IOException
-     */
-    public byte[] getChunkContent(int chunkIndex) throws IndexOutOfBoundsException, IOException {
-	if (chunkIndex > this.getTotalNumberOfChunks())
-	    throw new IndexOutOfBoundsException();
-
-	return storage.read(id, chunkIndex);
-
     }
 
 }

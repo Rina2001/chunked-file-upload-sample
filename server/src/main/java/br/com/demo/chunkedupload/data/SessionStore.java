@@ -34,9 +34,6 @@ public class SessionStore {
     public Session createSession(Long user, String fileName, int chunkSize, Long fileSize)
 	    throws InvalidOperationException, SessionAlreadyBeingCreatedException {
 
-	System.out
-		.println("Requested to create session for user " + user + " and file " + fileName + " on SessionStore");
-
 	String key = buildKey(user, fileName);
 
 	// avoids a race condition on session creation...

@@ -1,11 +1,8 @@
 package br.com.demo.chunkedupload.resource;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -55,6 +52,7 @@ public class FileResource {
     @Produces({ MediaType.APPLICATION_JSON })
     @ApiOperation(value = "uploads a file")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Chunk uploaded successfully"),
+	    @ApiResponse(code = 202, message = "Server busy during that particular upload. Try again."),
 	    @ApiResponse(code = 410, message = "Session expired"),
 	    @ApiResponse(code = 500, message = "Internal server error") })
     public Response uploadFile(@ApiParam(value = "ID of user", required = true) @PathParam("userId") Long userId,
@@ -126,6 +124,7 @@ public class FileResource {
 
     @GET
     @Path("/download/{sessionId}")
+    @Produces(MediaType.MULTIPART_FORM_DATA)
     @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"), @ApiResponse(code = 404, message = "Not found"),
 	    @ApiResponse(code = 500, message = "Internal server error") })
     @ApiOperation(value = "downloads a previously uploaded file")
@@ -141,17 +140,16 @@ public class FileResource {
 	StreamingOutput stream = new StreamingOutput() {
 	    @Override
 	    public void write(OutputStream out) throws IOException, WebApplicationException {
-		Writer writer = new BufferedWriter(new OutputStreamWriter(out));
 
-		// chunk numbers under this API start from 1.
 		for (int i = 1; i <= session.getTotalNumberOfChunks(); i++) {
-		    IOUtils.write(session.getChunkContent(i), writer);
+		    out.write(session.getChunkContent(i));
 		}
 
-		writer.flush();
+		out.flush();
+
 	    }
 	};
-	return Response.ok(stream)
+	return Response.ok(stream, MediaType.MULTIPART_FORM_DATA).header("Content-Length", session.getFileSize())
 		.header("Content-Disposition", "attachment; filename=\"" + session.getFileName() + "\"").build();
     }
 
