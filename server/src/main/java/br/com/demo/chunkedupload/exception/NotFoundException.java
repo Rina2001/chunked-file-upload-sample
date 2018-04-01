@@ -16,9 +16,10 @@
 
 package br.com.demo.chunkedupload.exception;
 
-@SuppressWarnings("serial")
 public class NotFoundException extends ApiException {
-    public NotFoundException(String msg) {
-	super(404, msg);
-    }
+  private int code;
+  public NotFoundException (int code, String msg) {
+    super(code, msg);
+    this.code = code;
+  }
 }

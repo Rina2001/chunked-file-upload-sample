@@ -11,6 +11,7 @@ import io.swagger.models.Swagger;
 import io.swagger.models.Tag;
 
 public class Bootstrap extends HttpServlet {
+
     @Override
     public void init(ServletConfig config) throws ServletException {
 	Info info = new Info().title("File management API");

@@ -20,6 +20,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
@@ -27,6 +28,7 @@ import com.sun.jersey.multipart.FormDataParam;
 import br.com.demo.chunkedupload.data.Session;
 import br.com.demo.chunkedupload.data.SessionStore;
 import br.com.demo.chunkedupload.exception.InvalidOperationException;
+import br.com.demo.chunkedupload.exception.SampleExceptionMapper;
 import br.com.demo.chunkedupload.exception.SessionAlreadyBeingCreatedException;
 import br.com.demo.chunkedupload.model.UploadStatusResponse;
 import io.swagger.annotations.Api;
@@ -38,6 +40,7 @@ import io.swagger.annotations.ApiResponses;
 @Path("/file")
 @Api(value = "/file", tags = "file")
 @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+@Component
 public class FileResource {
     private Logger LOG = LoggerFactory.getLogger(FileResource.class);
     private static SessionStore sessionStore;
@@ -88,9 +91,10 @@ public class FileResource {
     @GET
     @Path("/upload/{userId}")
     @Produces({ MediaType.APPLICATION_JSON })
-    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"), @ApiResponse(code = 404, message = "Not found"),
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = UploadStatusResponse.class),
+	    @ApiResponse(code = 404, message = "Not found"),
 	    @ApiResponse(code = 500, message = "Internal server error") })
-    @ApiOperation(value = "gets the status of a single upload", response = br.com.demo.chunkedupload.model.UploadStatusResponse.class)
+    @ApiOperation(value = "gets the status of a single upload", response = UploadStatusResponse.class)
     public Response getUploadStatus(@ApiParam(value = "ID of user", required = true) @PathParam("userId") Long userId,
 	    @QueryParam("chunkNumber") int chunkNumber, @QueryParam("totalSize") Long totalSize,
 	    @QueryParam("fileName") String fileName) {
@@ -110,7 +114,8 @@ public class FileResource {
     @GET
     @Path("/uploads")
     @Produces({ MediaType.APPLICATION_JSON })
-    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+    @ApiResponses(value = {
+	    @ApiResponse(code = 200, message = "OK", response = UploadStatusResponse.class, responseContainer = "List"),
 	    @ApiResponse(code = 500, message = "Internal server error") })
     @ApiOperation(value = "gets the status of upload sessions", response = UploadStatusResponse.class, responseContainer = "List")
     public Response listUploadsStatus() {
@@ -131,7 +136,7 @@ public class FileResource {
     public Response downloadFile(
 	    @ApiParam(value = "File ID", required = true) @PathParam("sessionId") String sessionId) {
 
-	Session session = sessionStore.getSession(sessionId);
+	final Session session = sessionStore.getSession(sessionId);
 
 	if (session == null) {
 	    return Response.status(404).build();

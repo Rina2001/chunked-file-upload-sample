@@ -39,7 +39,7 @@ public class Session {
 	this.fileSize = fileSize;
 
 	storage = new LocalFileSystemStorage();
-	alreadyPersistedBlocks = Collections.synchronizedSet(new HashSet<>());
+	alreadyPersistedBlocks = Collections.synchronizedSet(new HashSet<Integer>());
     }
 
     /**

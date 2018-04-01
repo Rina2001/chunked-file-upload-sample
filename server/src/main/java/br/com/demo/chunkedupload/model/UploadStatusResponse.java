@@ -27,7 +27,7 @@ public class UploadStatusResponse {
     }
 
     public static List<UploadStatusResponse> fromSessionList(List<Session> sessions) {
-	List<UploadStatusResponse> translated = new ArrayList<>();
+	List<UploadStatusResponse> translated = new ArrayList<UploadStatusResponse>();
 
 	for (Session s : sessions) {
 	    translated.add(fromSession(s));

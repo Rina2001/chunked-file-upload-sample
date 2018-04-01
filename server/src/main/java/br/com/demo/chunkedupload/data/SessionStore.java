@@ -1,12 +1,12 @@
 package br.com.demo.chunkedupload.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import br.com.demo.chunkedupload.exception.InvalidOperationException;
 import br.com.demo.chunkedupload.exception.SessionAlreadyBeingCreatedException;
@@ -17,8 +17,8 @@ public class SessionStore {
     Set<String> sessionLocks;
 
     public SessionStore() {
-	sessions = Collections.synchronizedMap(new ConcurrentHashMap<>());
-	sessionLocks = Collections.synchronizedSet(new HashSet<>());
+	sessions = Collections.synchronizedMap(new ConcurrentHashMap<String, Session>());
+	sessionLocks = Collections.synchronizedSet(new HashSet<String>());
     }
 
     /**
@@ -73,7 +73,11 @@ public class SessionStore {
     }
 
     public List<Session> getAllSessions() {
-	return Collections.unmodifiableList(sessions.values().stream().collect(Collectors.toList()));
+	List<Session> list = new ArrayList<Session>();
+	for (Session s : sessions.values())
+	    list.add(s);
+
+	return list;
     }
 
     private static String buildKey(Long user, String fileName) {
