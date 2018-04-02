@@ -1,12 +1,16 @@
 package br.com.demo.chunkedupload.data;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
 
 import br.com.demo.chunkedupload.exception.InvalidOperationException;
 
@@ -16,11 +20,17 @@ public class Session {
     private int chunkSize;
     private LocalDateTime createdDate;
 
+    private boolean failed = false;
     private String fileName;
     private Long fileSize;
-    private String id;
 
+    private String id;
     private LocalDateTime lastUpdate;
+
+    // it is here just to be serialized
+    @SuppressWarnings("unused")
+    private String status;
+
     private StorageMedium storage;
 
     private Long TIMEOUT_IN_SECONDS = 3600L;
@@ -106,6 +116,17 @@ public class Session {
 	return getSuccessfulChunks() / (getTotalNumberOfChunks() * 1f);
     }
 
+    public String getStatus() {
+	if (failed)
+	    status = "failed";
+	else if (isConcluded())
+	    status = "done";
+	else
+	    status = "ongoing";
+
+	return status;
+    }
+
     /**
      * @return the alreadyPersistedBlocks
      */
@@ -117,7 +138,7 @@ public class Session {
      * @return the totalNumberOfChunks
      */
     public int getTotalNumberOfChunks() {
-	return (int) Math.ceil(fileSize / chunkSize);
+	return (int) Math.ceil(fileSize / (chunkSize * 1F));
     }
 
     /**
@@ -125,6 +146,10 @@ public class Session {
      */
     public Long getUser() {
 	return user;
+    }
+
+    public boolean hasFailed() {
+	return failed;
     }
 
     public boolean isBlockPersisted(int chunkNumber) {
@@ -139,9 +164,18 @@ public class Session {
 	return Duration.between(lastUpdate, LocalDateTime.now()).getSeconds() >= TIMEOUT_IN_SECONDS;
     }
 
+    public void maskAsFailed() {
+	failed = true;
+    }
+
     public void persistBlock(int chunkNumber, byte[] buffer) throws InvalidOperationException {
 	if (chunkSize != buffer.length && chunkNumber < getTotalNumberOfChunks()) {
 	    throw new InvalidOperationException("Wrong chunk size");
+	}
+
+	if (buffer.length > chunkSize && chunkNumber == getTotalNumberOfChunks()) {
+	    throw new InvalidOperationException(
+		    "Last chunk cannot be greater than previously configured in upload session.");
 	}
 
 	if (!isBlockPersisted(chunkNumber)) {
@@ -154,6 +188,21 @@ public class Session {
 	}
 
 	this.lastUpdate = LocalDateTime.now();
+    }
+
+    public StreamingOutput getContentStream() {
+	return new StreamingOutput() {
+	    @Override
+	    public void write(OutputStream out) throws IOException, WebApplicationException {
+
+		for (int i = 1; i <= getTotalNumberOfChunks(); i++) {
+		    out.write(getChunkContent(i));
+		}
+
+		out.flush();
+
+	    }
+	};
     }
 
 }

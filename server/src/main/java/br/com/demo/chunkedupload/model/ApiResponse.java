@@ -13,6 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 package br.com.demo.chunkedupload.model;
 
 import javax.xml.bind.annotation.XmlTransient;
@@ -28,6 +29,7 @@ public class ApiResponse {
     int code;
     String type;
     String message;
+    String sessionId;
 
     public ApiResponse() {
     }
@@ -57,6 +59,11 @@ public class ApiResponse {
 	this.message = message;
     }
 
+    public ApiResponse(int code, String message, String sessionId) {
+	this(code, message);
+	this.setSessionId(sessionId);
+    }
+
     @XmlTransient
     public int getCode() {
 	return code;
@@ -80,5 +87,13 @@ public class ApiResponse {
 
     public void setMessage(String message) {
 	this.message = message;
+    }
+
+    public String getSessionId() {
+	return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+	this.sessionId = sessionId;
     }
 }

@@ -22,6 +22,7 @@ public class UploadStatusResponse {
 	model.setTotalNumberOfChunks(session.getTotalNumberOfChunks());
 	model.setUser(session.getUser());
 	model.setId(session.getId());
+	model.setStatus(session.getStatus());
 
 	return model;
     }
@@ -43,18 +44,20 @@ public class UploadStatusResponse {
     private String createdDate;
 
     private Boolean expired;
+
     private String fileName;
+
     private String id;
+
     private String lastUpdate;
     private Double progress;
+    private String status;
     private Integer successfulChunks;
     private Integer totalNumberOfChunks;
     private Long user;
-
     public Integer getChunkSize() {
 	return chunkSize;
     }
-
     public Boolean getConcluded() {
 	return concluded;
     }
@@ -84,6 +87,13 @@ public class UploadStatusResponse {
 
     public Double getProgress() {
 	return progress;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+	return status;
     }
 
     public Integer getSuccessfulChunks() {
@@ -128,6 +138,11 @@ public class UploadStatusResponse {
 
     public void setProgress(Double progress) {
 	this.progress = progress;
+    }
+
+    private void setStatus(String status) {
+	this.status = status;
+
     }
 
     public void setSuccessfulChunks(Integer successfulChunks) {
