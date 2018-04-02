@@ -8,9 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Component;
+
 import br.com.demo.chunkedupload.exception.InvalidOperationException;
 import br.com.demo.chunkedupload.exception.SessionAlreadyBeingCreatedException;
 
+@Component
 public class SessionStore {
 
     Map<String, Session> sessions;

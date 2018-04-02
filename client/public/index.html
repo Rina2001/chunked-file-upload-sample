@@ -128,10 +128,13 @@
 
       var userId = Math.random().toFixed() + 1; //just to ensure the random id is not zero.
 
+      var sessionId = null;
+
       var r = new Resumable({
         target: host + '/api/file/upload/' + userId,
         chunkSize: 1 * 1024 * 1024,
         simultaneousUploads: 4,
+        uploadMethod: 'PUT',
         testChunks: false,
         throttleProgressCallbacks: 1,
         fileParameterName: 'file',
@@ -160,8 +163,29 @@
           // Add the file to the list
           $('.resumable-list').append('<li class="resumable-file-' + file.uniqueIdentifier + '">Uploading <span class="resumable-file-name"></span> <span class="resumable-file-progress"></span>');
           $('.resumable-file-' + file.uniqueIdentifier + ' .resumable-file-name').html(file.fileName);
-          // Actually start the upload
-          r.upload();
+
+
+          // Start the upload session then start the upload of chunks
+          $.post(host + '/api/file/upload/' + userId,
+            {
+              chunkSize: r.opts.chunkSize,
+              totalSize: file.size,
+              fileName: file.fileName,
+            },
+            function (data) {
+              sessionId = data.sessionId;
+              r.opts.sessionId = sessionId;
+              // /api/upload/user/{userId}/session/{sessionId}/
+              r.opts.target = host + '/api/upload/user/' + userId + '/session/' + sessionId;
+
+              r.upload();
+
+            }).fail(function (e) {
+              console.log(e);
+              $('.resumable-file-' + file.uniqueIdentifier + ' .resumable-file-progress').html('(file could not be uploaded: ' + e + ')');
+            });
+
+
         });
         r.on('pause', function () {
           // Show resume, hide pause
