@@ -8,153 +8,158 @@ import br.com.demo.chunkedupload.data.Session;
 @javax.xml.bind.annotation.XmlRootElement
 public class UploadStatusResponse {
 
-    public static UploadStatusResponse fromSession(Session session) {
-	UploadStatusResponse model = new UploadStatusResponse();
+	public static UploadStatusResponse fromSession(Session session) {
+		UploadStatusResponse model = new UploadStatusResponse();
 
-	model.setChunkSize(session.getChunkSize());
-	model.setConcluded(session.isConcluded());
-	model.setCreatedDate(session.getCreatedDate());
-	model.setExpired(session.isExpired());
-	model.setFileName(session.getFileName());
-	model.setLastUpdate(session.getLastUpdate());
-	model.setProgress(session.getProgress());
-	model.setSuccessfulChunks(session.getSuccessfulChunks());
-	model.setTotalNumberOfChunks(session.getTotalNumberOfChunks());
-	model.setUser(session.getUser());
-	model.setId(session.getId());
-	model.setStatus(session.getStatus());
+		model.setChunkSize(session.getFileInfo().getChunkSize());
+		model.setFileName(session.getFileInfo().getFileName());
+		model.setTotalNumberOfChunks(session.getFileInfo().getTotalNumberOfChunks());
 
-	return model;
-    }
+		model.setConcluded(session.isConcluded());
+		model.setCreatedDate(session.getCreatedDate());
+		model.setExpired(session.isExpired());
 
-    public static List<UploadStatusResponse> fromSessionList(List<Session> sessions) {
-	List<UploadStatusResponse> translated = new ArrayList<UploadStatusResponse>();
+		model.setLastUpdate(session.getLastUpdate());
+		model.setProgress(session.getProgress());
+		model.setSuccessfulChunks(session.getSuccessfulChunks());
 
-	for (Session s : sessions) {
-	    translated.add(fromSession(s));
+		model.setUser(session.getUser());
+		model.setId(session.getId());
+		model.setStatus(session.getStatus());
+
+		return model;
 	}
 
-	return translated;
-    }
+	public static List<UploadStatusResponse> fromSessionList(List<Session> sessions) {
+		List<UploadStatusResponse> translated = new ArrayList<UploadStatusResponse>();
 
-    private Integer chunkSize;
+		for (Session s : sessions) {
+			translated.add(fromSession(s));
+		}
 
-    private Boolean concluded;
+		return translated;
+	}
 
-    private String createdDate;
+	private Integer chunkSize;
 
-    private Boolean expired;
+	private Boolean concluded;
 
-    private String fileName;
+	private String createdDate;
 
-    private String id;
+	private Boolean expired;
 
-    private String lastUpdate;
-    private Double progress;
-    private String status;
-    private Integer successfulChunks;
-    private Integer totalNumberOfChunks;
-    private Long user;
-    public Integer getChunkSize() {
-	return chunkSize;
-    }
-    public Boolean getConcluded() {
-	return concluded;
-    }
+	private String fileName;
 
-    public String getCreatedDate() {
-	return createdDate;
-    }
+	private String id;
 
-    public Boolean getExpired() {
-	return expired;
-    }
+	private String lastUpdate;
+	private Double progress;
+	private String status;
+	private Integer successfulChunks;
+	private Integer totalNumberOfChunks;
+	private Long user;
 
-    public String getFileName() {
-	return fileName;
-    }
+	public Integer getChunkSize() {
+		return chunkSize;
+	}
 
-    /**
-     * @return the id
-     */
-    public String getId() {
-	return id;
-    }
+	public Boolean getConcluded() {
+		return concluded;
+	}
 
-    public String getLastUpdate() {
-	return lastUpdate;
-    }
+	public String getCreatedDate() {
+		return createdDate;
+	}
 
-    public Double getProgress() {
-	return progress;
-    }
+	public Boolean getExpired() {
+		return expired;
+	}
 
-    /**
-     * @return the status
-     */
-    public String getStatus() {
-	return status;
-    }
+	public String getFileName() {
+		return fileName;
+	}
 
-    public Integer getSuccessfulChunks() {
-	return successfulChunks;
-    }
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
 
-    public Integer getTotalNumberOfChunks() {
-	return totalNumberOfChunks;
-    }
+	public String getLastUpdate() {
+		return lastUpdate;
+	}
 
-    public Long getUser() {
-	return user;
-    }
+	public Double getProgress() {
+		return progress;
+	}
 
-    public void setChunkSize(Integer chunkSize) {
-	this.chunkSize = chunkSize;
-    }
+	/**
+	 * @return the status
+	 */
+	public String getStatus() {
+		return status;
+	}
 
-    public void setConcluded(Boolean concluded) {
-	this.concluded = concluded;
-    }
+	public Integer getSuccessfulChunks() {
+		return successfulChunks;
+	}
 
-    public void setCreatedDate(String createdDate) {
-	this.createdDate = createdDate;
-    }
+	public Integer getTotalNumberOfChunks() {
+		return totalNumberOfChunks;
+	}
 
-    public void setExpired(Boolean expired) {
-	this.expired = expired;
-    }
+	public Long getUser() {
+		return user;
+	}
 
-    public void setFileName(String fileName) {
-	this.fileName = fileName;
-    }
+	public void setChunkSize(Integer chunkSize) {
+		this.chunkSize = chunkSize;
+	}
 
-    public void setId(String id) {
-	this.id = id;
-    }
+	public void setConcluded(Boolean concluded) {
+		this.concluded = concluded;
+	}
 
-    public void setLastUpdate(String lastUpdate) {
-	this.lastUpdate = lastUpdate;
-    }
+	public void setCreatedDate(String createdDate) {
+		this.createdDate = createdDate;
+	}
 
-    public void setProgress(Double progress) {
-	this.progress = progress;
-    }
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
 
-    private void setStatus(String status) {
-	this.status = status;
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setSuccessfulChunks(Integer successfulChunks) {
-	this.successfulChunks = successfulChunks;
-    }
+	public void setLastUpdate(String lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
 
-    public void setTotalNumberOfChunks(Integer totalNumberOfChunks) {
-	this.totalNumberOfChunks = totalNumberOfChunks;
-    }
+	public void setProgress(Double progress) {
+		this.progress = progress;
+	}
 
-    public void setUser(Long user) {
-	this.user = user;
-    }
+	private void setStatus(String status) {
+		this.status = status;
+
+	}
+
+	public void setSuccessfulChunks(Integer successfulChunks) {
+		this.successfulChunks = successfulChunks;
+	}
+
+	public void setTotalNumberOfChunks(Integer totalNumberOfChunks) {
+		this.totalNumberOfChunks = totalNumberOfChunks;
+	}
+
+	public void setUser(Long user) {
+		this.user = user;
+	}
 
 }

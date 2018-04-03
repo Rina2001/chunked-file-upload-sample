@@ -16,10 +16,16 @@
 
 package br.com.demo.chunkedupload.exception;
 
-public class BadRequestException extends ApiException{
-  private int code;
-  public BadRequestException (int code, String msg) {
-    super(code, msg);
-    this.code = code;
-  }
+public class BadRequestException extends ApiException {
+	private int code;
+
+	public BadRequestException(String msg) {
+		super(400, msg);
+		this.code = 400;
+	}
+
+	public BadRequestException(int code, String msg) {
+		super(code, msg);
+		this.code = code;
+	}
 }
