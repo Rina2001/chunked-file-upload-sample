@@ -40,8 +40,8 @@ public class SampleExceptionMapper implements ExceptionMapper<Exception> {
 	    return Response.status(Status.BAD_REQUEST)
 		    .entity(new ApiResponse(ApiResponse.ERROR, exception.getMessage())).build();
 	} else if (exception instanceof ApiException) {
-	    return Response.status(Status.BAD_REQUEST)
-		    .entity(new ApiResponse(ApiResponse.ERROR, exception.getMessage())).build();
+	    return Response.status(Status.FORBIDDEN).entity(new ApiResponse(ApiResponse.ERROR, exception.getMessage()))
+		    .build();
 	} else {
 	    return Response.status(500).entity(new ApiResponse(500, "something bad happened")).build();
 	}

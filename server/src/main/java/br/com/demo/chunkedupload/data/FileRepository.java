@@ -8,9 +8,9 @@ import javax.ws.rs.core.StreamingOutput;
 
 public abstract class FileRepository {
 
-	abstract void persist(String id, int chunkNumber, byte[] buffer) throws IOException;
+	public abstract void persist(String id, int chunkNumber, byte[] buffer) throws IOException;
 
-	abstract byte[] read(String id, int chunkNumber) throws IOException;
+	public abstract byte[] read(String id, int chunkNumber) throws IOException;
 
 	public StreamingOutput getContentStream(Session session) throws IOException {
 		return new StreamingOutput() {

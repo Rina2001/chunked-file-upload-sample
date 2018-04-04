@@ -133,7 +133,8 @@
       var r = new Resumable({
         target: host + '/api/file/upload/' + userId,
         chunkSize: 1 * 1024 * 1024,
-        simultaneousUploads: 4,
+        forceChunkSize: true,
+        simultaneousUploads: 1,
         uploadMethod: 'PUT',
         testChunks: false,
         throttleProgressCallbacks: 1,
