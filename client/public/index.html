@@ -167,7 +167,7 @@
 
 
           // Start the upload session then start the upload of chunks
-          $.post(host + '/api/file/upload/' + userId,
+          $.post(host + '/api/file/create/' + userId,
             {
               chunkSize: r.opts.chunkSize,
               totalSize: file.size,

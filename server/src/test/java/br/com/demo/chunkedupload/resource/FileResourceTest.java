@@ -45,6 +45,7 @@ public class FileResourceTest {
     private static final int STATUS_FORBIDDEN = 403;
     private static final int STATUS_NOT_FOUND = 404;
     private static final int STATUS_SERVER_ERROR = 500;
+    private static final int STATUS_CREATED = 201;
 
     private FileResource fileResource;
 
@@ -65,14 +66,14 @@ public class FileResourceTest {
     }
 
     @Test
-    public void startSession_WithValidData_shouldReturnOKResponse() throws ApiException {
+    public void startSession_WithValidData_shouldReturnCreatedResponse() throws ApiException {
 	when(session.getFileInfo()).thenReturn(file);
 
 	when(uploadService.createSession(any(), any(), anyInt(), any())).thenReturn(session);
 
 	Response response = fileResource.startSession(1L, 1, 1L, UUID.randomUUID().toString());
 
-	assertThat(response.getStatus(), equalTo(STATUS_OK));
+	assertThat(response.getStatus(), equalTo(STATUS_CREATED));
     }
 
     @Test

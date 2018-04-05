@@ -30,13 +30,13 @@ public class UploadService {
     FileRepository fileStorage;
 
     public UploadService(FileRepository storage) {
-	this.fileStorage = storage;
-	sessions = Collections.synchronizedMap(new ConcurrentHashMap<String, Session>());
+        this.fileStorage = storage;
+        sessions = Collections.synchronizedMap(new ConcurrentHashMap<String, Session>());
     }
 
     /**
      * Creates a new session
-     * 
+     *
      * @param user
      * @param fileName
      * @param chunkSize
@@ -46,74 +46,74 @@ public class UploadService {
      */
     public Session createSession(Long user, String fileName, int chunkSize, Long fileSize) throws BadRequestException {
 
-	if (StringUtils.isEmpty(fileName))
-	    throw new BadRequestException("File name missing");
+        if (StringUtils.isEmpty(fileName))
+            throw new BadRequestException("File name missing");
 
-	if (user == null)
-	    throw new BadRequestException("User ID missing");
+        if (user == null)
+            throw new BadRequestException("User ID missing");
 
-	if (chunkSize > CHUNK_LIMIT)
-	    throw new BadRequestException(String.format("Maximum chunk size is {} bytes", CHUNK_LIMIT));
+        if (chunkSize > CHUNK_LIMIT)
+            throw new BadRequestException(String.format("Maximum chunk size is {} bytes", CHUNK_LIMIT));
 
-	if (chunkSize < 1)
-	    throw new BadRequestException("Chunk size must be greater than zero");
+        if (chunkSize < 1)
+            throw new BadRequestException("Chunk size must be greater than zero");
 
-	if (fileSize < 1)
-	    throw new BadRequestException("Total size must be greater than zero");
+        if (fileSize < 1)
+            throw new BadRequestException("Total size must be greater than zero");
 
-	Session session = new Session(user, new FileInformation(fileSize, fileName, chunkSize));
-	sessions.put(session.getId(), session);
+        Session session = new Session(user, new FileInformation(fileSize, fileName, chunkSize));
+        sessions.put(session.getId(), session);
 
-	LOG.debug(">> Created session {}, fileName {}, chunkSize {}, fileSize {}, totalChunks {}", new Object[] {
-		session.getId(), fileName, chunkSize, fileSize, session.getFileInfo().getTotalNumberOfChunks() });
+        LOG.debug(">> Created session {}, fileName {}, chunkSize {}, fileSize {}, totalChunks {}", new Object[] {
+                session.getId(), fileName, chunkSize, fileSize, session.getFileInfo().getTotalNumberOfChunks() });
 
-	return session;
+        return session;
     }
 
     public Session getSession(String id) {
-	return sessions.get(id);
+        return sessions.get(id);
     }
 
     public List<Session> getAllSessions() {
-	List<Session> list = new ArrayList<Session>();
-	for (Session s : sessions.values()) {
-	    list.add(s);
-	}
-	return list;
+        List<Session> list = new ArrayList<>();
+        for (Session s : sessions.values()) {
+            list.add(s);
+        }
+        return list;
     }
 
     public void persistBlock(String sessionId, Long userId, int chunkNumber, byte[] buffer)
-	    throws ApiException, IOException {
-	Session session = getSession(sessionId);
+            throws ApiException, IOException {
+        Session session = getSession(sessionId);
 
-	try {
-	    if (session == null) {
-		throw new NotFoundException("Session not found");
-	    }
+        try {
+            if (session == null) {
+                throw new NotFoundException("Session not found");
+            }
 
-	    fileStorage.persist(sessionId, chunkNumber, buffer);
+            fileStorage.persist(sessionId, chunkNumber, buffer);
 
-	    LOG.debug(">> Persisted session {}, chunkNumber {}, {} bytes",
-		    new Object[] { sessionId, chunkNumber, buffer.length });
+            LOG.debug(">> Persisted session {}, chunkNumber {}, {} bytes",
+                    new Object[] { sessionId, chunkNumber, buffer.length });
 
-	    session.getFileInfo().markChunkAsPersisted(chunkNumber);
-	    session.renewTimeout();
-	} catch (Exception e) {
-	    if (session != null)
-		session.maskAsFailed();
+            session.getFileInfo().markChunkAsPersisted(chunkNumber);
+            session.renewTimeout();
+        } catch (Exception e) {
+            if (session != null)
+                session.maskAsFailed();
 
-	    throw e;
-	}
+            throw e;
+        }
     }
 
     public StreamingOutput getContentStream(Session session)
-	    throws IOException, InvalidOperationException, NotFoundException {
-	if (!session.isConcluded())
-	    throw new InvalidOperationException("Upload is not yet finished");
+            throws IOException, InvalidOperationException, NotFoundException {
+        if (!session.isConcluded())
+            throw new InvalidOperationException("Upload is not yet finished");
 
-	if (session.hasFailed())
-	    throw new NotFoundException("File not found");
+        if (session.hasFailed())
+            throw new NotFoundException("File not found");
 
-	return fileStorage.getContentStream(session);
+        return fileStorage.getContentStream(session);
     }
 }
