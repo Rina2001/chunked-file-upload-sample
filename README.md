@@ -4,7 +4,7 @@
 
 An example to demonstrate chunked file uploading to a Java server. The client uses Resumable.js, which in turn uses HTML 5 file API to generate the chunks.
 
-A .NET Core version is also available: (https://github.com/edsoncunha/chunked-file-upload-sample)[https://github.com/edsoncunha/chunked-file-upload-sample].
+A .NET Core version is also available: [https://github.com/edsoncunha/chunked-file-upload-sample](https://github.com/edsoncunha/chunked-file-upload-sample).
 
 ## Client
 
