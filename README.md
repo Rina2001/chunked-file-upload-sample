@@ -2,9 +2,9 @@
 [![Build Status](https://travis-ci.org/edsoncunha/chunked-file-upload-sample.svg?branch=master)](https://travis-ci.org/edsoncunha/chunked-file-upload-sample)
 [![License Apache2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
-An example to demonstrate chunked file uploading to a Java server. The client uses Resumable.js, which in turn uses HTML 5 file API to generate the chunks.
+An example to demonstrate chunked file uploading to a Java server. The client uses [Resumable.js](https://github.com/23/resumable.js), which in turn uses HTML 5 file API to generate the chunks.
 
-A .NET Core version is also available: [https://github.com/edsoncunha/chunked-file-upload-sample](https://github.com/edsoncunha/chunked-file-upload-sample).
+A .NET Core version is also available: [https://github.com/edsoncunha/chunked-file-upload-csharp](https://github.com/edsoncunha/chunked-file-upload-csharp).
 
 ## Client
 
